@@ -152,7 +152,7 @@ services:
       - minio_root_user
       - minio_root_password
     volumes:
-      - minio-data:/data
+      - ${MINIO_DATA_PATH:-./data/minio}:/data
     networks:
       - internal
     expose:
@@ -211,7 +211,6 @@ networks:
 volumes:
   postgres-data:
   redis-data:
-  minio-data:
 
 secrets:
   database_url:

@@ -76,7 +76,7 @@ export default function FormularioPage() {
           <Image src="/logo.png" width={120} height={48} alt="CREE" priority />
           <div>
             <p className="text-sm font-medium text-muted-foreground">Comisión Reguladora de Energía Eléctrica</p>
-            <h1 className="text-xl font-semibold tracking-normal">Recepción de fotografías</h1>
+            <h1 className="text-xl font-semibold tracking-normal">Recepción de Reclamos</h1>
           </div>
         </div>
       </header>

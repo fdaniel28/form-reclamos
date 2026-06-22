@@ -11,15 +11,21 @@ async function main() {
     return;
   }
 
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
+
   await prisma.adminUser.upsert({
     where: { email },
-    update: {},
+    update: {
+      passwordHash,
+      role: "ADMIN",
+      active: true
+    },
     create: {
       email,
       name: "Administrador inicial",
       role: "ADMIN",
       active: true,
-      passwordHash: await argon2.hash(password, { type: argon2.argon2id })
+      passwordHash
     }
   });
 }

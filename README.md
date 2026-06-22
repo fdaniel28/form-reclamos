@@ -117,7 +117,25 @@ Definir `AZURE_AD_CLIENT_ID`, `AZURE_AD_TENANT_ID` y el secret en `secrets/azure
 
 ## MinIO / NAS Synology
 
-MinIO se ejecuta como S3 compatible para almacenar objetos. Para Synology/NAS, monte el volumen de MinIO en una ruta respaldada por el NAS o configure el almacenamiento persistente del host hacia el NAS. El bucket es privado, tiene versioning habilitado y el panel solo accede mediante URL firmada temporal.
+MinIO se ejecuta como S3 compatible para almacenar las fotografias. Las imagenes no se guardan en `public/` ni se exponen como archivos estaticos; la base de datos solo guarda metadatos y el `objectKey`.
+
+El contenedor MinIO guarda sus objetos en `/data`. En `docker-compose.yml`, esa ruta se monta desde `MINIO_DATA_PATH`:
+
+```env
+MINIO_DATA_PATH=./data/minio
+```
+
+Para usar un NAS Synology, primero monte el recurso compartido del NAS en el host donde corre Docker y luego apunte `MINIO_DATA_PATH` a esa ruta montada. Ejemplos:
+
+```env
+# Windows con Docker Desktop
+MINIO_DATA_PATH=C:/cree/minio-data
+
+# Linux
+MINIO_DATA_PATH=/mnt/synology/cree/minio-data
+```
+
+La ruta debe existir antes de levantar Docker y debe ser escribible por el contenedor de MinIO. Mantenga esa carpeta fuera del repositorio, con backups y permisos restringidos. No use una carpeta sincronizada publica ni un recurso compartido accesible por usuarios no autorizados.
 
 No exponga MinIO Console en internet. El servicio `minio-init` crea el bucket privado, activa versioning y crea un usuario de aplicacion con politica de minimo privilegio.
 

@@ -4,6 +4,7 @@ node_modules
 .env.*
 !.env.example
 secrets/
+data/
 nginx/certs
 docker/postgres/certs
 coverage

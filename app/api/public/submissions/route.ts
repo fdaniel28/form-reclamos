@@ -86,7 +86,8 @@ export async function POST(request: Request) {
 
     await audit("SUBMISSION_CREATED", { targetId: client.id });
     return NextResponse.json({ ok: true, message: "Solicitud recibida." });
-  } catch {
+  } catch (error) {
+    console.error("public_submission_failed", error);
     return genericError(400);
   }
 }
