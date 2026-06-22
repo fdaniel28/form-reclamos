@@ -1,0 +1,2 @@
+ALTER TABLE "clients" ADD COLUMN "phone" VARCHAR(30);
+ALTER TABLE "clients" ADD COLUMN "email" VARCHAR(254);

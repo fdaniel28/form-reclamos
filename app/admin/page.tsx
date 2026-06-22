@@ -62,9 +62,11 @@ export default async function AdminPage({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-32">No. de Queja</TableHead>
+                    <TableHead className="w-28">No. de Queja</TableHead>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Código</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Correo</TableHead>
                     <TableHead>Fotos</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead />
@@ -78,6 +80,10 @@ export default async function AdminPage({
                       </TableCell>
                       <TableCell>{client.fullName}</TableCell>
                       <TableCell>{client.clientCode}</TableCell>
+                      <TableCell className="text-muted-foreground">{client.phone ?? "—"}</TableCell>
+                      <TableCell className="max-w-[180px] truncate text-muted-foreground" title={client.email ?? ""}>
+                        {client.email ?? "—"}
+                      </TableCell>
                       <TableCell>{client._count.photos}</TableCell>
                       <TableCell>{client.createdAt.toLocaleString("es-HN")}</TableCell>
                       <TableCell>

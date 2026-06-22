@@ -41,12 +41,24 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <div>
+            <p className="text-sm text-muted-foreground">No. de Queja</p>
+            <p className="font-mono font-semibold">#{client.complaintNumber}</p>
+          </div>
+          <div>
             <p className="text-sm text-muted-foreground">Nombre completo</p>
             <p className="font-medium">{client.fullName}</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Número/Código</p>
             <p className="font-medium">{client.clientCode}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Teléfono</p>
+            <p className="font-medium">{client.phone ?? <span className="text-muted-foreground">—</span>}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Correo electrónico</p>
+            <p className="font-medium">{client.email ?? <span className="text-muted-foreground">—</span>}</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Fecha</p>

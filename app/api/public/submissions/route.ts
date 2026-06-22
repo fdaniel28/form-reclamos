@@ -24,6 +24,8 @@ export async function POST(request: Request) {
     const parsed = publicSubmissionSchema.safeParse({
       fullName: formData.get("fullName"),
       clientCode: formData.get("clientCode"),
+      phone: formData.get("phone") ?? "",
+      email: formData.get("email") ?? "",
       website: formData.get("website") ?? ""
     });
 
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
         data: {
           fullName: parsed.data.fullName,
           clientCode: parsed.data.clientCode,
+          phone: parsed.data.phone || null,
+          email: parsed.data.email || null,
           ipHash,
           userAgent
         }

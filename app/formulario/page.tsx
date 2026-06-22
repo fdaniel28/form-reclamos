@@ -14,6 +14,11 @@ import { Label } from "@/components/ui/label";
 const schema = z.object({
   fullName: z.string().trim().min(3, "Ingrese su nombre completo.").max(180),
   clientCode: z.string().trim().min(3, "Ingrese el número o código de cliente.").max(80),
+  phone: z.string().trim().max(30).optional(),
+  email: z.union([
+    z.string().trim().email("Correo electrónico inválido."),
+    z.literal("")
+  ]).optional(),
   photos: z
     .custom<FileList>()
     .refine((files) => files && files.length >= 1, "Adjunte al menos una fotografía.")
@@ -105,6 +110,8 @@ export default function FormularioPage() {
     const body = new FormData();
     body.append("fullName", values.fullName);
     body.append("clientCode", values.clientCode);
+    body.append("phone", values.phone ?? "");
+    body.append("email", values.email ?? "");
     body.append("website", values.website ?? "");
     Array.from(values.photos).forEach((file) => body.append("photos", file));
 
@@ -178,6 +185,39 @@ export default function FormularioPage() {
                 {errors.clientCode && (
                   <p className="text-sm text-destructive">{errors.clientCode.message}</p>
                 )}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">
+                    Teléfono <span className="text-muted-foreground">(opcional)</span>
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="Ej. +504 9999-9999"
+                    autoComplete="tel"
+                    {...register("phone")}
+                  />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">
+                    Correo electrónico <span className="text-muted-foreground">(opcional)</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Ej. correo@ejemplo.com"
+                    autoComplete="email"
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
+                </div>
               </div>
 
               <div className="hidden" aria-hidden="true">
@@ -307,7 +347,7 @@ export default function FormularioPage() {
               </p>
               <p className="flex gap-2">
                 <span className="font-semibold text-foreground">3.</span>
-                Adjunte fotografías nítidas del recibo.
+                Adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
               </p>
               <p className="flex gap-2">
                 <span className="font-semibold text-foreground">4.</span>

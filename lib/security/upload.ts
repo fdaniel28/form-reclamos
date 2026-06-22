@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db/prisma";
 export const publicSubmissionSchema = z.object({
   fullName: z.string().trim().min(3).max(180),
   clientCode: z.string().trim().min(3).max(80).regex(/^[A-Za-z0-9._\-\/ ]+$/),
+  phone: z.string().trim().max(30).optional(),
+  email: z.union([z.string().trim().email().max(254), z.literal("")]).optional(),
   website: z.string().max(0).optional()
 });
 
