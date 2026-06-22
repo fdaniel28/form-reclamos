@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "exceljs": "^4.4.0",
     "file-type": "^19.6.0",
     "ioredis": "^5.4.1",
     "jose": "^5.9.6",

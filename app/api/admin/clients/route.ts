@@ -10,12 +10,14 @@ export async function GET(request: Request) {
   }
 
   const q = new URL(request.url).searchParams.get("q")?.trim();
+  const qNum = q && /^\d+$/.test(q) ? parseInt(q, 10) : undefined;
   const clients = await prisma.client.findMany({
     where: q
       ? {
           OR: [
             { fullName: { contains: q, mode: "insensitive" } },
-            { clientCode: { contains: q, mode: "insensitive" } }
+            { clientCode: { contains: q, mode: "insensitive" } },
+            ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
           ]
         }
       : undefined,

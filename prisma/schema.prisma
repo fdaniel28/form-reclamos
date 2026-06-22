@@ -25,13 +25,14 @@ enum AuditAction {
 }
 
 model Client {
-  id         String        @id @default(uuid()) @db.Uuid
-  fullName   String        @map("full_name") @db.VarChar(180)
-  clientCode String        @map("client_code") @db.VarChar(80)
-  ipHash     String?       @map("ip_hash") @db.VarChar(128)
-  userAgent  String?       @map("user_agent") @db.VarChar(512)
-  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  photos     ClientPhoto[]
+  id              String        @id @default(uuid()) @db.Uuid
+  complaintNumber Int           @unique @default(autoincrement()) @map("complaint_number")
+  fullName        String        @map("full_name") @db.VarChar(180)
+  clientCode      String        @map("client_code") @db.VarChar(80)
+  ipHash          String?       @map("ip_hash") @db.VarChar(128)
+  userAgent       String?       @map("user_agent") @db.VarChar(512)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  photos          ClientPhoto[]
 
   @@index([clientCode], map: "idx_clients_client_code")
   @@index([fullName], map: "idx_clients_full_name")

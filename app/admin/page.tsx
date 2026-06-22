@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { prisma } from "@/lib/db/prisma";
 import { requireSession } from "@/lib/auth/session";
@@ -12,12 +12,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export default async function AdminPage({ searchParams }: { searchParams: { q?: string } }) {
   const session = await requireSession("AUDITOR");
   const q = searchParams.q?.trim();
+  const qNum = q && /^\d+$/.test(q) ? parseInt(q, 10) : undefined;
+
   const clients = await prisma.client.findMany({
     where: q
       ? {
           OR: [
             { fullName: { contains: q, mode: "insensitive" } },
-            { clientCode: { contains: q, mode: "insensitive" } }
+            { clientCode: { contains: q, mode: "insensitive" } },
+            ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
           ]
         }
       : undefined,
@@ -30,51 +33,88 @@ export default async function AdminPage({ searchParams }: { searchParams: { q?: 
     await audit("CLIENT_QUERY", { actorId: session.user.adminId, metadata: { q } });
   }
 
+  const exportHref = `/api/admin/export${q ? `?q=${encodeURIComponent(q)}` : ""}`;
+
   return (
     <AdminShell>
-      <section className="mx-auto max-w-7xl px-4 py-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Registros recibidos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="mb-5 flex gap-2">
-            <Input name="q" defaultValue={q} placeholder="Buscar por nombre o código de cliente" />
-            <Button type="submit">
-              <Search className="h-4 w-4" />
-              Buscar
-            </Button>
-          </form>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Fotos</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>{client.fullName}</TableCell>
-                    <TableCell>{client.clientCode}</TableCell>
-                    <TableCell>{client._count.photos}</TableCell>
-                    <TableCell>{client.createdAt.toLocaleString("es-HN")}</TableCell>
-                    <TableCell>
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/admin/clients/${client.id}`}>Detalle</Link>
-                      </Button>
-                    </TableCell>
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Registros recibidos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="mb-5 flex gap-2">
+              <Input
+                name="q"
+                defaultValue={q}
+                placeholder="Buscar por No. de queja, nombre o código de cliente"
+              />
+              <Button type="submit">
+                <Search className="h-4 w-4" />
+                Buscar
+              </Button>
+            </form>
+
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-32">No. de Queja</TableHead>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Código</TableHead>
+                    <TableHead>Fotos</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {clients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-mono font-medium">
+                        #{client.complaintNumber}
+                      </TableCell>
+                      <TableCell>{client.fullName}</TableCell>
+                      <TableCell>{client.clientCode}</TableCell>
+                      <TableCell>{client._count.photos}</TableCell>
+                      <TableCell>{client.createdAt.toLocaleString("es-HN")}</TableCell>
+                      <TableCell>
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/admin/clients/${client.id}`}>Detalle</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {clients.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                        No se encontraron registros.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Exportar registros</CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              {q
+                ? `Descarga en Excel los registros que coinciden con la búsqueda "${q}".`
+                : "Descarga en Excel todos los registros recibidos."}
+            </p>
+            <Button asChild variant="outline">
+              <a href={exportHref} download>
+                <Download className="h-4 w-4" />
+                Descargar Excel
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
       </section>
     </AdminShell>
   );
