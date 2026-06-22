@@ -10,19 +10,32 @@ export async function GET(request: Request) {
     return new Response("No autorizado.", { status: 401 });
   }
 
-  const q = new URL(request.url).searchParams.get("q")?.trim() || undefined;
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q")?.trim() || undefined;
+  const from = url.searchParams.get("from") || undefined;
+  const to = url.searchParams.get("to") || undefined;
   const qNum = q && /^\d+$/.test(q) ? parseInt(q, 10) : undefined;
 
   const clients = await prisma.client.findMany({
-    where: q
-      ? {
-          OR: [
-            { fullName: { contains: q, mode: "insensitive" } },
-            { clientCode: { contains: q, mode: "insensitive" } },
-            ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
-          ]
-        }
-      : undefined,
+    where: {
+      ...(q
+        ? {
+            OR: [
+              { fullName: { contains: q, mode: "insensitive" } },
+              { clientCode: { contains: q, mode: "insensitive" } },
+              ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
+            ]
+          }
+        : {}),
+      ...(from || to
+        ? {
+            createdAt: {
+              ...(from ? { gte: new Date(from) } : {}),
+              ...(to ? { lte: new Date(`${to}T23:59:59.999Z`) } : {})
+            }
+          }
+        : {})
+    },
     include: { _count: { select: { photos: true } } },
     orderBy: { complaintNumber: "asc" }
   });
@@ -43,11 +56,7 @@ export async function GET(request: Request) {
 
   const headerRow = sheet.getRow(1);
   headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
-  headerRow.fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: "FF1A4E7A" }
-  };
+  headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A4E7A" } };
   headerRow.alignment = { vertical: "middle", horizontal: "center" };
   headerRow.height = 20;
 

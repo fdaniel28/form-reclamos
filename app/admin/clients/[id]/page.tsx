@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PhotoLink } from "@/components/admin/photo-link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { audit } from "@/lib/audit/audit";
@@ -25,6 +28,13 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
   return (
     <AdminShell>
       <section className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-2">
+          <Link href="/admin">
+            <ArrowLeft className="h-4 w-4" />
+            Regresar
+          </Link>
+        </Button>
+
       <Card>
         <CardHeader>
           <CardTitle>Detalle del cliente</CardTitle>

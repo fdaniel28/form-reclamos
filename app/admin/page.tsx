@@ -1,39 +1,52 @@
 import Link from "next/link";
-import { Download, Search } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { RecordsFilters } from "@/components/admin/records-filters";
 import { prisma } from "@/lib/db/prisma";
 import { requireSession } from "@/lib/auth/session";
 import { audit } from "@/lib/audit/audit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export default async function AdminPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function AdminPage({
+  searchParams
+}: {
+  searchParams: { q?: string; from?: string; to?: string }
+}) {
   const session = await requireSession("AUDITOR");
   const q = searchParams.q?.trim();
+  const from = searchParams.from;
+  const to = searchParams.to;
   const qNum = q && /^\d+$/.test(q) ? parseInt(q, 10) : undefined;
 
   const clients = await prisma.client.findMany({
-    where: q
-      ? {
-          OR: [
-            { fullName: { contains: q, mode: "insensitive" } },
-            { clientCode: { contains: q, mode: "insensitive" } },
-            ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
-          ]
-        }
-      : undefined,
+    where: {
+      ...(q
+        ? {
+            OR: [
+              { fullName: { contains: q, mode: "insensitive" } },
+              { clientCode: { contains: q, mode: "insensitive" } },
+              ...(qNum !== undefined ? [{ complaintNumber: { equals: qNum } }] : [])
+            ]
+          }
+        : {}),
+      ...(from || to
+        ? {
+            createdAt: {
+              ...(from ? { gte: new Date(from) } : {}),
+              ...(to ? { lte: new Date(`${to}T23:59:59.999Z`) } : {})
+            }
+          }
+        : {})
+    },
     include: { _count: { select: { photos: true } } },
     orderBy: { createdAt: "desc" },
-    take: 50
+    take: 100
   });
 
   if (q) {
     await audit("CLIENT_QUERY", { actorId: session.user.adminId, metadata: { q } });
   }
-
-  const exportHref = `/api/admin/export${q ? `?q=${encodeURIComponent(q)}` : ""}`;
 
   return (
     <AdminShell>
@@ -42,18 +55,8 @@ export default async function AdminPage({ searchParams }: { searchParams: { q?: 
           <CardHeader>
             <CardTitle>Registros recibidos</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form className="mb-5 flex gap-2">
-              <Input
-                name="q"
-                defaultValue={q}
-                placeholder="Buscar por No. de queja, nombre o código de cliente"
-              />
-              <Button type="submit">
-                <Search className="h-4 w-4" />
-                Buscar
-              </Button>
-            </form>
+          <CardContent className="space-y-4">
+            <RecordsFilters initialQ={q} initialFrom={from} initialTo={to} />
 
             <div className="overflow-x-auto">
               <Table>
@@ -94,25 +97,6 @@ export default async function AdminPage({ searchParams }: { searchParams: { q?: 
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Exportar registros</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              {q
-                ? `Descarga en Excel los registros que coinciden con la búsqueda "${q}".`
-                : "Descarga en Excel todos los registros recibidos."}
-            </p>
-            <Button asChild variant="outline">
-              <a href={exportHref} download>
-                <Download className="h-4 w-4" />
-                Descargar Excel
-              </a>
-            </Button>
           </CardContent>
         </Card>
       </section>
