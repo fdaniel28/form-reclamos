@@ -345,7 +345,7 @@ export default function FormularioPage() {
                 <span className="font-semibold text-foreground">2.</span>
                 Indique el número o código de cliente visible en su factura.
               </p>
-              <p className="flex gap-2 rounded-md bg-primary/10 px-2 py-1 font-semibold text-foreground">
+              <p className="flex gap-2 rounded-md px-2 py-1 font-semibold text-foreground" style={{ backgroundColor: "#FBB040" }}>
                 <span>3.</span>
                 Adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
               </p>
