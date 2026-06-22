@@ -32,8 +32,8 @@ const schema = z.object({
       "Solo se permiten imágenes JPG, JPEG, PNG o WEBP."
     )
     .refine(
-      (files) => files && Array.from(files).every((file) => file.size <= 5 * 1024 * 1024),
-      "Cada archivo debe pesar 5 MB o menos."
+      (files) => files && Array.from(files).every((file) => file.size <= 20 * 1024 * 1024),
+      "Cada archivo debe pesar 20 MB o menos."
     ),
   website: z.string().max(0).optional()
 });
@@ -51,7 +51,7 @@ function Header() {
           <p className="text-sm font-medium text-muted-foreground">
             Comisión Reguladora de Energía Eléctrica
           </p>
-          <h1 className="text-xl font-semibold tracking-normal">Recepción de Reclamos</h1>
+          <h1 className="text-xl font-bold tracking-normal text-primary">Recepción de Reclamos de Roatán</h1>
         </div>
       </div>
     </header>
@@ -250,7 +250,7 @@ export default function FormularioPage() {
                       Arrastra tus fotos aquí o haz clic para seleccionar
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      JPG, PNG o WEBP · 5 MB por archivo
+                      JPG, PNG o WEBP · 20 MB por archivo
                       {previews.length > 0
                         ? ` · Puedes agregar ${5 - previews.length} foto${5 - previews.length === 1 ? "" : "s"} más`
                         : " · máximo 5 fotos"}
@@ -345,8 +345,8 @@ export default function FormularioPage() {
                 <span className="font-semibold text-foreground">2.</span>
                 Indique el número o código de cliente visible en su factura.
               </p>
-              <p className="flex gap-2">
-                <span className="font-semibold text-foreground">3.</span>
+              <p className="flex gap-2 rounded-md bg-primary/10 px-2 py-1 font-semibold text-foreground">
+                <span>3.</span>
                 Adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
               </p>
               <p className="flex gap-2">

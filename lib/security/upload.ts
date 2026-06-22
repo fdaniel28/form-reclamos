@@ -13,7 +13,7 @@ export const publicSubmissionSchema = z.object({
 
 export const defaultUploadLimits = {
   maxFiles: 5,
-  maxFileSizeBytes: 5 * 1024 * 1024,
+  maxFileSizeBytes: 20 * 1024 * 1024,
   allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"]
 };
 
