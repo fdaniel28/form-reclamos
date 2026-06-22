@@ -71,11 +71,13 @@ export default function FormularioPage() {
 
   const photosField = register("photos");
 
-  function updateFromFiles(files: File[]) {
+  function updateFromFiles(newFiles: File[]) {
+    const combined = [...previews.map((p) => p.file), ...newFiles].slice(0, 5);
     previews.forEach((p) => URL.revokeObjectURL(p.url));
-    setPreviews(files.map((file) => ({ file, url: URL.createObjectURL(file) })));
+    const next = combined.map((file) => ({ file, url: URL.createObjectURL(file) }));
+    setPreviews(next);
     const dt = new DataTransfer();
-    files.forEach((f) => dt.items.add(f));
+    combined.forEach((f) => dt.items.add(f));
     setValue("photos", dt.files, { shouldValidate: previews.length > 0 });
   }
 
@@ -186,30 +188,35 @@ export default function FormularioPage() {
               <div className="space-y-3">
                 <Label>Fotografías</Label>
 
-                <div
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Zona de carga de fotografías"
-                  onClick={() => fileInputRef.current?.click()}
-                  onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
-                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={handleDrop}
-                  className={[
-                    "cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
-                    isDragging
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                  ].join(" ")}
-                >
-                  <ImagePlus className="mx-auto mb-3 h-9 w-9 text-muted-foreground" />
-                  <p className="text-sm font-medium">
-                    Arrastra tus fotos aquí o haz clic para seleccionar
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    JPG, PNG o WEBP · máximo 5 archivos · 5 MB por archivo
-                  </p>
-                </div>
+                {previews.length < 5 && (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Zona de carga de fotografías"
+                    onClick={() => fileInputRef.current?.click()}
+                    onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
+                    className={[
+                      "cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
+                      isDragging
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    ].join(" ")}
+                  >
+                    <ImagePlus className="mx-auto mb-3 h-9 w-9 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arrastra tus fotos aquí o haz clic para seleccionar
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      JPG, PNG o WEBP · 5 MB por archivo
+                      {previews.length > 0
+                        ? ` · Puedes agregar ${5 - previews.length} foto${5 - previews.length === 1 ? "" : "s"} más`
+                        : " · máximo 5 fotos"}
+                    </p>
+                  </div>
+                )}
 
                 <input
                   type="file"
