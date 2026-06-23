@@ -9,12 +9,14 @@ interface Props {
   role: AdminRole;
   active: boolean;
   onUpdated: (user: AdminUser) => void;
+  onPasswordReset: (email: string, tempPassword: string) => void;
+  userEmail: string;
 }
 
-export function UserActions({ userId, role, active, onUpdated }: Props) {
+export function UserActions({ userId, role, active, onUpdated, onPasswordReset, userEmail }: Props) {
   const [loading, setLoading] = useState(false);
 
-  async function patch(payload: { role?: AdminRole; active?: boolean }) {
+  async function patch(payload: { role?: AdminRole; active?: boolean; resetPassword?: true }) {
     setLoading(true);
     try {
       const response = await fetch("/api/admin/users", {
@@ -25,6 +27,9 @@ export function UserActions({ userId, role, active, onUpdated }: Props) {
       if (response.ok) {
         const data = await response.json();
         onUpdated(data.user as AdminUser);
+        if (data.tempPassword) {
+          onPasswordReset(userEmail, data.tempPassword);
+        }
       }
     } finally {
       setLoading(false);
@@ -45,6 +50,9 @@ export function UserActions({ userId, role, active, onUpdated }: Props) {
       </select>
       <Button variant="outline" size="sm" disabled={loading} onClick={() => patch({ active: !active })}>
         {active ? "Desactivar" : "Activar"}
+      </Button>
+      <Button variant="outline" size="sm" disabled={loading} onClick={() => patch({ resetPassword: true })}>
+        Restablecer contraseña
       </Button>
     </div>
   );

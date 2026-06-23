@@ -35,7 +35,7 @@ COPY --from=builder /app/prisma ./prisma
 # Native modules not traced by Next.js standalone — copy compiled binaries from deps stage
 COPY --from=deps /app/node_modules/argon2 ./node_modules/argon2
 COPY --from=deps /app/node_modules/node-gyp-build ./node_modules/node-gyp-build
-RUN npm install sharp --no-save
+RUN npm install sharp --no-save --fetch-retries 5 --fetch-retry-mintimeout 10000
 USER node
 EXPOSE 3000
 CMD ["sh", "-c", "if [ -n \"$DATABASE_URL_FILE\" ]; then export DATABASE_URL=\"$(cat \"$DATABASE_URL_FILE\")\"; fi; node server.js"]

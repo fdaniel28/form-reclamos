@@ -81,9 +81,11 @@ export function UsersManager({ initialUsers }: Props) {
                   <TableCell>
                     <UserActions
                       userId={user.id}
+                      userEmail={user.email}
                       role={user.role as AdminRole}
                       active={user.active}
                       onUpdated={handleUserUpdated}
+                      onPasswordReset={(email, tempPassword) => setCreated({ email, tempPassword })}
                     />
                   </TableCell>
                 </TableRow>

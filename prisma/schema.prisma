@@ -22,6 +22,7 @@ enum AuditAction {
   USER_CREATED
   SETTINGS_CHANGE
   SUBMISSION_CREATED
+  PASSWORD_RESET
 }
 
 model Client {

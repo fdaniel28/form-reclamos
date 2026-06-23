@@ -14,10 +14,11 @@ export async function AdminShell({ children }: { children: ReactNode }) {
               CREE Admin
             </Link>
             <nav className="flex gap-4 text-sm text-muted-foreground">
-              <Link href="/admin">Registros</Link>
-              <Link href="/admin/users">Usuarios</Link>
-              <Link href="/admin/audit">Auditoría</Link>
-              <Link href="/admin/settings">Configuración</Link>
+              {session.user.role !== "AUDITOR" && <Link href="/admin">Registros</Link>}
+              {session.user.role === "ADMIN" && <Link href="/admin/users">Usuarios</Link>}
+              {session.user.role === "ADMIN" && <Link href="/admin/audit">Auditoría</Link>}
+              {session.user.role === "AUDITOR" && <Link href="/admin/audit">Auditoría</Link>}
+              {session.user.role === "ADMIN" && <Link href="/admin/settings">Configuración</Link>}
             </nav>
           </div>
           <div className="text-right text-sm">

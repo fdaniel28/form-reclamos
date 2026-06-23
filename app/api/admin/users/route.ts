@@ -10,7 +10,8 @@ import { prisma } from "@/lib/db/prisma";
 const patchSchema = z.object({
   id: z.string().uuid(),
   active: z.boolean().optional(),
-  role: z.nativeEnum(AdminRole).optional()
+  role: z.nativeEnum(AdminRole).optional(),
+  resetPassword: z.literal(true).optional()
 });
 
 const createSchema = z.object({
@@ -71,12 +72,21 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ message: "No encontrado." }, { status: 404 });
   }
 
+  let tempPassword: string | undefined;
+  const updateData: Parameters<typeof prisma.adminUser.update>[0]["data"] = {
+    active: parsed.data.active,
+    role: parsed.data.role
+  };
+
+  if (parsed.data.resetPassword) {
+    tempPassword = generateTempPassword();
+    updateData.passwordHash = await argon2.hash(tempPassword, { type: argon2.argon2id });
+    updateData.mustChangePassword = true;
+  }
+
   const user = await prisma.adminUser.update({
     where: { id: parsed.data.id },
-    data: {
-      active: parsed.data.active,
-      role: parsed.data.role
-    }
+    data: updateData
   });
 
   if (parsed.data.role && parsed.data.role !== before.role) {
@@ -85,8 +95,11 @@ export async function PATCH(request: Request) {
   if (typeof parsed.data.active === "boolean" && parsed.data.active !== before.active) {
     await audit("USER_STATUS_CHANGE", { actorId: session.user.adminId, targetId: user.id, metadata: { active: user.active } });
   }
+  if (parsed.data.resetPassword) {
+    await audit("PASSWORD_RESET", { actorId: session.user.adminId, targetId: user.id, metadata: {} });
+  }
 
-  return NextResponse.json({ user });
+  return NextResponse.json({ user, ...(tempPassword ? { tempPassword } : {}) });
 }
 
 export async function POST(request: Request) {

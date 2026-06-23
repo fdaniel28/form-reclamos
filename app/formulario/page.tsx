@@ -179,7 +179,44 @@ export default function FormularioPage() {
       <Header />
 
       <section className="mx-auto grid max-w-5xl gap-6 px-4 py-8 md:grid-cols-[1fr_300px]">
-        <Card>
+        <aside className="space-y-4 md:order-last">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">¿Cómo presentar su reclamo?</CardTitle>
+            </CardHeader>
+            <CardContent className="-mt-2 space-y-3 text-sm text-muted-foreground">
+              <p className="flex gap-2">
+                <span className="font-semibold text-foreground">1.</span>
+                Ingrese su nombre completo tal como aparece en su recibo.
+              </p>
+              <p className="flex gap-2">
+                <span className="font-semibold text-foreground">2.</span>
+                Indique el número o código de cliente visible en su factura.
+              </p>
+              <p className="flex gap-2 rounded-md px-2 py-1 font-semibold text-foreground" style={{ backgroundColor: "#FBB040" }}>
+                <span>3.</span>
+                Adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
+              </p>
+              <p className="flex gap-2">
+                <span className="font-semibold text-foreground">4.</span>
+                Presione <span className="font-medium text-foreground">Enviar solicitud</span> y espere la confirmación.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="hidden md:block">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Carga segura
+              </CardTitle>
+              <CardDescription>
+                Las fotografías se validan antes de almacenarse y no se publican en internet.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </aside>
+
+        <Card className="md:order-first">
           <CardHeader>
             <CardTitle>Formulario de reclamo</CardTitle>
             <CardDescription>
@@ -346,43 +383,6 @@ export default function FormularioPage() {
           </CardContent>
         </Card>
 
-        <aside className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-                Carga segura
-              </CardTitle>
-              <CardDescription>
-                Las fotografías se validan antes de almacenarse y no se publican en internet.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">¿Cómo presentar su reclamo?</CardTitle>
-            </CardHeader>
-            <CardContent className="-mt-2 space-y-3 text-sm text-muted-foreground">
-              <p className="flex gap-2">
-                <span className="font-semibold text-foreground">1.</span>
-                Ingrese su nombre completo tal como aparece en su recibo.
-              </p>
-              <p className="flex gap-2">
-                <span className="font-semibold text-foreground">2.</span>
-                Indique el número o código de cliente visible en su factura.
-              </p>
-              <p className="flex gap-2 rounded-md px-2 py-1 font-semibold text-foreground" style={{ backgroundColor: "#FBB040" }}>
-                <span>3.</span>
-                Adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
-              </p>
-              <p className="flex gap-2">
-                <span className="font-semibold text-foreground">4.</span>
-                Presione <span className="font-medium text-foreground">Enviar solicitud</span> y espere la confirmación.
-              </p>
-            </CardContent>
-          </Card>
-        </aside>
       </section>
     </main>
   );
