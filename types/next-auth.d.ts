@@ -6,12 +6,14 @@ declare module "next-auth" {
     user: DefaultSession["user"] & {
       adminId: string;
       role: AdminRole;
+      mustChangePassword: boolean;
     };
   }
 
   interface User {
     adminId?: string;
     role?: AdminRole;
+    mustChangePassword?: boolean;
   }
 }
 
@@ -19,5 +21,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     adminId?: string;
     role?: AdminRole;
+    mustChangePassword?: boolean;
   }
 }

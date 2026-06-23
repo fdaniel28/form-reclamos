@@ -4,7 +4,7 @@ import { SignOutButton } from "@/components/admin/sign-out-button";
 import { requireSession } from "@/lib/auth/session";
 
 export async function AdminShell({ children }: { children: ReactNode }) {
-  const session = await requireSession();
+  const session = await requireSession("AUDITOR", { allowPendingPassword: true });
   return (
     <main className="min-h-screen bg-muted/40">
       <header className="border-b bg-white">
@@ -21,7 +21,9 @@ export async function AdminShell({ children }: { children: ReactNode }) {
             </nav>
           </div>
           <div className="text-right text-sm">
-            <p className="font-medium">{session.user.email}</p>
+            <Link href="/admin/profile" className="font-medium hover:underline">
+              {session.user.email}
+            </Link>
             <p className="text-muted-foreground">{session.user.role}</p>
             <SignOutButton />
           </div>

@@ -1,12 +1,17 @@
 "use client";
 
-import type { AdminRole } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import type { AdminRole, AdminUser } from "@prisma/client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function UserActions({ userId, role, active }: { userId: string; role: AdminRole; active: boolean }) {
-  const router = useRouter();
+interface Props {
+  userId: string;
+  role: AdminRole;
+  active: boolean;
+  onUpdated: (user: AdminUser) => void;
+}
+
+export function UserActions({ userId, role, active, onUpdated }: Props) {
   const [loading, setLoading] = useState(false);
 
   async function patch(payload: { role?: AdminRole; active?: boolean }) {
@@ -18,7 +23,8 @@ export function UserActions({ userId, role, active }: { userId: string; role: Ad
         body: JSON.stringify({ id: userId, ...payload })
       });
       if (response.ok) {
-        router.refresh();
+        const data = await response.json();
+        onUpdated(data.user as AdminUser);
       }
     } finally {
       setLoading(false);
@@ -29,7 +35,7 @@ export function UserActions({ userId, role, active }: { userId: string; role: Ad
     <div className="flex flex-wrap items-center gap-2">
       <select
         className="h-9 rounded-md border bg-background px-2 text-sm"
-        defaultValue={role}
+        value={role}
         disabled={loading}
         onChange={(event) => patch({ role: event.target.value as AdminRole })}
       >

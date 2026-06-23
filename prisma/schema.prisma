@@ -67,6 +67,7 @@ model AdminUser {
   role           AdminRole  @default(REVISOR)
   active         Boolean    @default(true)
   entraObjectId  String?    @unique @map("entra_object_id") @db.VarChar(128)
+  mustChangePassword Boolean  @default(false) @map("must_change_password")
   lastLoginAt    DateTime?  @map("last_login_at") @db.Timestamptz(6)
   createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)

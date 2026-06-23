@@ -1,29 +1,34 @@
 "use client";
 
-import type { AdminRole } from "@prisma/client";
+import type { AdminRole, AdminUser } from "@prisma/client";
 import { UserPlus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function CreateUserForm() {
-  const router = useRouter();
-  const [message, setMessage] = useState<string | null>(null);
+interface Props {
+  onCreated: (user: AdminUser, tempPassword: string) => void;
+}
+
+export function CreateUserForm({ onCreated }: Props) {
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(null);
+    setError(null);
     setLoading(true);
 
-    const form = new FormData(event.currentTarget);
+    // Guardar referencia antes del primer await — event.currentTarget se vuelve null en async
+    const formEl = event.currentTarget;
+    const form = new FormData(formEl);
+
     const response = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: form.get("email"),
+        email: (form.get("email") as string).trim(),
         name: form.get("name"),
         role: form.get("role") as AdminRole,
         active: form.get("active") === "on"
@@ -32,13 +37,14 @@ export function CreateUserForm() {
 
     setLoading(false);
     if (!response.ok) {
-      setMessage("No fue posible crear el usuario.");
+      const data = await response.json().catch(() => ({}));
+      setError(data.message ?? "No fue posible crear el usuario.");
       return;
     }
 
-    event.currentTarget.reset();
-    setMessage("Usuario creado.");
-    router.refresh();
+    const data = await response.json();
+    formEl.reset();
+    onCreated(data.user as AdminUser, data.tempPassword as string);
   }
 
   return (
@@ -68,9 +74,9 @@ export function CreateUserForm() {
       <div className="md:col-span-4">
         <Button type="submit" disabled={loading}>
           <UserPlus className="h-4 w-4" />
-          {loading ? "Creando" : "Crear usuario"}
+          {loading ? "Creando..." : "Crear usuario"}
         </Button>
-        {message ? <p className="mt-2 text-sm text-muted-foreground">{message}</p> : null}
+        {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </div>
     </form>
   );

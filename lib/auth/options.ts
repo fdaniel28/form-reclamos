@@ -71,7 +71,8 @@ if (env.localLoginEnabled) {
           adminId: admin.id,
           email: admin.email,
           name: admin.name,
-          role: admin.role
+          role: admin.role,
+          mustChangePassword: admin.mustChangePassword
         };
       }
     })
@@ -119,6 +120,7 @@ export const authOptions: NextAuthOptions = {
       if (user?.adminId && user.role) {
         token.adminId = user.adminId;
         token.role = user.role;
+        token.mustChangePassword = user.mustChangePassword ?? false;
       }
 
       if (!token.adminId && token.email) {
@@ -128,6 +130,7 @@ export const authOptions: NextAuthOptions = {
         if (admin?.active) {
           token.adminId = admin.id;
           token.role = admin.role;
+          token.mustChangePassword = admin.mustChangePassword;
         }
       }
 
@@ -137,6 +140,7 @@ export const authOptions: NextAuthOptions = {
       if (token.adminId && token.role) {
         session.user.adminId = token.adminId;
         session.user.role = token.role;
+        session.user.mustChangePassword = token.mustChangePassword ?? false;
       }
       return session;
     }
