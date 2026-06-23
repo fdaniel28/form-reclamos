@@ -10,14 +10,7 @@ export function PhotoLink({ photoId }: { photoId: string }) {
   async function openPhoto() {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/photos?id=${encodeURIComponent(photoId)}`);
-      if (!response.ok) {
-        return;
-      }
-      const payload = (await response.json()) as { url?: string };
-      if (payload.url) {
-        window.open(payload.url, "_blank", "noopener,noreferrer");
-      }
+      window.open(`/api/admin/photos?id=${encodeURIComponent(photoId)}`, "_blank", "noopener,noreferrer");
     } finally {
       setLoading(false);
     }

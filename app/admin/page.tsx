@@ -85,7 +85,7 @@ export default async function AdminPage({
                         {client.email ?? "—"}
                       </TableCell>
                       <TableCell>{client._count.photos}</TableCell>
-                      <TableCell>{client.createdAt.toLocaleString("es-HN")}</TableCell>
+                      <TableCell>{client.createdAt.toLocaleString("es-HN", { timeZone: "America/Tegucigalpa" })}</TableCell>
                       <TableCell>
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/admin/clients/${client.id}`}>Detalle</Link>

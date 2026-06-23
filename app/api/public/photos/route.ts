@@ -1,9 +1,7 @@
 import { Readable } from "node:stream";
-import { audit } from "@/lib/audit/audit";
-import { requireApiSession } from "@/lib/auth/session";
-import { prisma } from "@/lib/db/prisma";
 import { env } from "@/lib/env";
-import { minioClient } from "@/lib/minio/client";
+import { minioClient, photoPublicToken } from "@/lib/minio/client";
+import { prisma } from "@/lib/db/prisma";
 
 export const runtime = "nodejs";
 
@@ -16,22 +14,23 @@ const MIME_MAP: Record<string, string> = {
 };
 
 export async function GET(request: Request) {
-  const session = await requireApiSession("AUDITOR");
-  if (!session) {
-    return Response.json({ message: "No autorizado." }, { status: 401 });
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const token = searchParams.get("token");
+
+  if (!id || !token) {
+    return new Response("Solicitud inválida.", { status: 400 });
   }
 
-  const id = new URL(request.url).searchParams.get("id");
-  if (!id) {
-    return Response.json({ message: "Solicitud inválida." }, { status: 400 });
+  const expected = photoPublicToken(id);
+  if (token !== expected) {
+    return new Response("Token inválido.", { status: 403 });
   }
 
   const photo = await prisma.clientPhoto.findUnique({ where: { id } });
   if (!photo) {
-    return Response.json({ message: "No encontrado." }, { status: 404 });
+    return new Response("No encontrado.", { status: 404 });
   }
-
-  await audit("PHOTO_VIEW", { actorId: session.user.adminId, targetId: photo.id });
 
   const ext = photo.objectKey.split(".").pop()?.toLowerCase() ?? "";
   const contentType = MIME_MAP[ext] ?? "application/octet-stream";
@@ -42,7 +41,7 @@ export async function GET(request: Request) {
   return new Response(webStream, {
     headers: {
       "Content-Type": contentType,
-      "Cache-Control": "private, max-age=300",
+      "Cache-Control": "public, max-age=31536000, immutable",
       "Content-Disposition": "inline",
     },
   });

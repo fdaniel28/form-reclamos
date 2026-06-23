@@ -48,7 +48,7 @@ export default async function UsersPage() {
                   <TableCell>
                     <Badge>{user.active ? "Activo" : "Inactivo"}</Badge>
                   </TableCell>
-                  <TableCell>{user.lastLoginAt?.toLocaleString("es-HN") ?? "-"}</TableCell>
+                  <TableCell>{user.lastLoginAt?.toLocaleString("es-HN", { timeZone: "America/Tegucigalpa" }) ?? "-"}</TableCell>
                   <TableCell>
                     <UserActions userId={user.id} role={user.role} active={user.active} />
                   </TableCell>

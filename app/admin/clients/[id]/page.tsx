@@ -62,7 +62,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Fecha</p>
-            <p className="font-medium">{client.createdAt.toLocaleString("es-HN")}</p>
+            <p className="font-medium">{client.createdAt.toLocaleString("es-HN", { timeZone: "America/Tegucigalpa" })}</p>
           </div>
         </CardContent>
       </Card>

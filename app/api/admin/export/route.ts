@@ -1,11 +1,10 @@
 import ExcelJS from "exceljs";
 import { requireApiSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
-import { getSignedPhotoUrl } from "@/lib/minio/client";
+import { photoPublicUrl } from "@/lib/minio/client";
 
 export const runtime = "nodejs";
 
-const PHOTO_LINK_TTL = 3600;
 const MAX_PHOTOS = 5;
 
 export async function GET(request: Request) {
@@ -91,14 +90,10 @@ export async function GET(request: Request) {
     excelRow.alignment = { vertical: "middle" };
 
     for (let i = 0; i < client.photos.length; i++) {
-      try {
-        const signedUrl = await getSignedPhotoUrl(client.photos[i].objectKey, PHOTO_LINK_TTL);
-        const cell = excelRow.getCell(8 + i);
-        cell.value = { text: `Foto ${i + 1}`, hyperlink: signedUrl };
-        cell.font = { color: { argb: "FF0563C1" }, underline: true };
-      } catch {
-        // skip if URL generation fails
-      }
+      const photoUrl = photoPublicUrl(client.photos[i].id);
+      const cell = excelRow.getCell(8 + i);
+      cell.value = { text: `Foto ${i + 1}`, hyperlink: photoUrl };
+      cell.font = { color: { argb: "FF0563C1" }, underline: true };
     }
   }
 

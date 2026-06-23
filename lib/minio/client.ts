@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { Client } from "minio";
 import { env } from "@/lib/env";
 
@@ -33,4 +34,13 @@ export async function uploadPhotoObject(objectKey: string, buffer: Buffer, mimeT
 
 export async function getSignedPhotoUrl(objectKey: string, ttlSeconds: number) {
   return minioClient.presignedGetObject(env.minio.bucket, objectKey, ttlSeconds);
+}
+
+export function photoPublicToken(photoId: string): string {
+  return createHmac("sha256", env.ipHashSecret).update(photoId).digest("hex");
+}
+
+export function photoPublicUrl(photoId: string): string {
+  const token = photoPublicToken(photoId);
+  return `${env.appUrl}/api/public/photos?id=${encodeURIComponent(photoId)}&token=${token}`;
 }

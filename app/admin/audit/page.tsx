@@ -32,7 +32,7 @@ export default async function AuditPage() {
             <TableBody>
               {logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell>{log.createdAt.toLocaleString("es-HN")}</TableCell>
+                  <TableCell>{log.createdAt.toLocaleString("es-HN", { timeZone: "America/Tegucigalpa" })}</TableCell>
                   <TableCell>{log.action}</TableCell>
                   <TableCell>{log.actor?.email ?? "Sistema"}</TableCell>
                   <TableCell>{log.targetId ?? "-"}</TableCell>

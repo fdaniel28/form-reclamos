@@ -4,11 +4,10 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const proto = request.headers.get("x-forwarded-proto");
 
-  if (process.env.NODE_ENV === "production" && proto && proto !== "https") {
-    const url = request.nextUrl.clone();
-    url.protocol = "https:";
-    return NextResponse.redirect(url, 308);
-  }
+  // HTTP→HTTPS redirect is handled by nginx (port 80 → 301 → 443).
+  // Do NOT redirect here: Next.js standalone injects x-forwarded-proto:http on its own
+  // internal requests (e.g. the image optimizer fetching /logo.png), which would cause
+  // those requests to redirect to a non-existent HTTPS port on the app container.
 
   if (process.env.NODE_ENV === "production") {
     response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
@@ -23,5 +22,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/health).*)"]
 };
