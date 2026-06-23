@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle2, ImagePlus, ShieldCheck, Upload, X } from "lucide-react";
 import Image from "next/image";
-import { DragEvent, useRef, useState } from "react";
+import { DragEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,12 @@ export default function FormularioPage() {
   const [previews, setPreviews] = useState<Preview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [showNotice, setShowNotice] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowNotice(false), 10000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const {
     register,
@@ -149,6 +155,27 @@ export default function FormularioPage() {
 
   return (
     <main className="min-h-screen bg-muted/40">
+      {showNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowNotice(false)} />
+          <div className="relative z-10 mx-4 w-full max-w-md rounded-xl bg-white shadow-2xl p-6">
+            <button
+              onClick={() => setShowNotice(false)}
+              aria-label="Cerrar aviso"
+              className="absolute left-4 top-4 rounded p-1 text-muted-foreground hover:bg-muted"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mt-6 flex flex-col items-center gap-4 text-center">
+              <ImagePlus className="h-12 w-12 text-primary" />
+              <p className="text-base font-medium leading-relaxed">
+                En el espacio de <span className="font-semibold">Fotografías</span> adjunte fotografías nítidas de su última factura y la nota de débito o crédito.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Header />
 
       <section className="mx-auto grid max-w-5xl gap-6 px-4 py-8 md:grid-cols-[1fr_300px]">
