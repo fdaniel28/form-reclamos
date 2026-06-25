@@ -11,9 +11,10 @@ interface Props {
   initialQ?: string;
   initialFrom?: string;
   initialTo?: string;
+  initialPageSize?: number;
 }
 
-export function RecordsFilters({ initialQ = "", initialFrom = "", initialTo = "" }: Props) {
+export function RecordsFilters({ initialQ = "", initialFrom = "", initialTo = "", initialPageSize = 10 }: Props) {
   const router = useRouter();
   const [q, setQ] = useState(initialQ);
   const [from, setFrom] = useState(initialFrom);
@@ -27,11 +28,12 @@ export function RecordsFilters({ initialQ = "", initialFrom = "", initialTo = ""
       if (q) params.set("q", q);
       if (from) params.set("from", from);
       if (to) params.set("to", to);
+      if (initialPageSize !== 10) params.set("pageSize", String(initialPageSize));
       const qs = params.toString();
       router.push(`/admin${qs ? `?${qs}` : ""}`);
     }, 400);
     return () => clearTimeout(timer);
-  }, [q, from, to, router]);
+  }, [q, from, to, router, initialPageSize]);
 
   const hasFilters = q || from || to;
   const exportParams = new URLSearchParams();
